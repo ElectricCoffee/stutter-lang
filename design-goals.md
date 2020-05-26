@@ -8,8 +8,8 @@
 3. JIT compiled with Julia-style method monomorphisation
 4. Macros!!
 5. Case sensitive
-6. Lisp-2
-7. Racket-style brace semantics
+6. Lisp-1
+7. Racket-style brace semantics (i.e. `()`, `[]`, and `{}` all mean the same)
 
 ## Modern Feel
 Perhaps one of the biggest detractors of Lisp (besides the parentheses) is how alien it looks as a language.

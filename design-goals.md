@@ -136,3 +136,46 @@ Accessors are just regular functions with one important change, they specify tha
       (set! (email person) new-email)
     (panic! "Invalid email format!!")))
 ```
+
+# Grammars and Regular Expressions
+Regular expressions are a common occurrence in situations where text parsing is required.
+For this reason, it's reasonable to include regex literals of the form `/foobar/` as seen in many other languages, as with strings, this would simply be sugar for `(regex foobar)`.
+
+Now, in slightly more difficult parsing situations, a more powerful construct may be required.
+Enter: Context-Free Grammars.
+Inspired by Raku (formerly Perl 6), grammars are a way for you to construct CFG rules, which let you construct parsing rules not commonly expressable with just regular expressions:
+
+```lisp
+(grammar email
+  ((Start name "@" (many subdomain ".") domain "." tld)
+   (name :r /\w+/ (many "." /\w+/))
+   (domain :r /\w+/)
+   (subdomain :r /\w+/)
+   (tld :r /\w+/)))
+```
+
+This maps to the equivalent Raku grammar
+```raku
+grammar Email {
+  regex TOP { <name> '@' [<subdomain> '.']* <domain> '.' <tld> }  
+  token name { \w+ ['.' \w+]* }
+  token domain { \w+ }
+  token subdomain { \w+ }
+  token tld { \w+ }
+}
+```
+The actual syntax may need to be workshopped a bit. The `:r` refers to Raku's notion of [ratcheting](https://docs.raku.org/language/regexes#Ratchet).
+
+Now, it's no secret that this entire thing could easily be replaced by one big regular expression, but grammars actually do let us express things that would otherwise be inexpressible with typical regular expressions, such as defining a simple Lisp grammar:
+
+```raku
+grammar Lisp {
+  regex TOP { <form> | <atom> }
+  rule form { '(' [<identifier> |<atom> ]+ ')' }
+  token atom { <number> | <symbol> }
+  token number { \d+ }
+  token symbol { \' <identifier> }
+  token identifier { <[A..Za..z]> \w* }
+}
+```
+which would be a pain to express in terms of regular expressions.
